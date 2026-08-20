@@ -326,6 +326,56 @@
       .theme-toggle { align-self: flex-start; }
     }
 
+    @media (max-width: 560px) {
+      .container {
+        width: min(100% - 20px, 1120px);
+        padding-top: 20px;
+        padding-bottom: 28px;
+      }
+
+      .card {
+        padding: 16px;
+        border-radius: 14px;
+      }
+
+      .notice,
+      .field-head,
+      .section-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .toolbar {
+        flex-direction: column;
+      }
+
+      .toolbar button,
+      .theme-toggle {
+        width: 100%;
+        justify-content: center;
+      }
+
+      textarea {
+        min-height: 200px;
+      }
+
+      textarea.small {
+        min-height: 140px;
+      }
+
+      .output {
+        padding: 12px;
+      }
+
+      table {
+        min-width: 0;
+      }
+
+      th, td {
+        padding: 10px;
+      }
+    }
+
     :root[data-theme="dark"] {
       --bg: #0f172a;
       --surface: #111c31;
