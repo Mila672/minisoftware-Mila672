@@ -1,0 +1,38 @@
+{
+  "name": "minisoftware-mila672",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web-App und Build-Konfigurationen fuer GitHub Pages, Android und Windows.",
+  "main": "electron/main.js",
+  "scripts": {
+    "prepare:web": "node scripts/prepare-web.js",
+    "build:android": "npm run prepare:web && npx cap add android && npx cap sync android && cd android && ./gradlew assembleDebug",
+    "build:windows": "npm run prepare:web && electron-builder --win portable"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.4.1",
+    "@capacitor/core": "8.4.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.1",
+    "electron": "43.4.0",
+    "electron-builder": "26.15.7"
+  },
+  "build": {
+    "appId": "com.mila672.minisoftware",
+    "productName": "Minisoftware Mila672",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "web/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "portable"
+      ]
+    }
+  }
+}
