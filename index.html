@@ -221,6 +221,13 @@
     }
 
     .status.success { color: var(--success); }
+    .status.error { color: var(--danger); }
+
+    textarea.input-warning {
+      border-color: var(--danger);
+      box-shadow: 0 0 0 4px rgba(180, 35, 24, 0.12);
+      background: var(--surface);
+    }
 
     .output {
       white-space: pre-wrap;
@@ -462,10 +469,11 @@
       $('themeToggleText').textContent = dunkel ? 'Hell' : 'Dunkel';
     }
 
-    function setStatus(id, text, success = false) {
+    function setStatus(id, text, state = '') {
       const el = $(id);
       el.textContent = text;
-      el.classList.toggle('success', success);
+      el.classList.toggle('success', state === 'success');
+      el.classList.toggle('error', state === 'error');
     }
 
     function updateCounts() {
@@ -493,17 +501,28 @@
       setTheme(aktuellesTheme === 'dark' ? 'light' : 'dark');
     });
 
-    $('eingabe').addEventListener('input', updateCounts);
+    $('eingabe').addEventListener('input', function () {
+      updateCounts();
+      if ($('eingabe').value.trim()) {
+        $('eingabe').classList.remove('input-warning');
+        if ($('statusBereinigen').classList.contains('error')) {
+          setStatus('statusBereinigen', '');
+        }
+      }
+    });
 
     $('bereinigen').addEventListener('click', function () {
       let text = $('eingabe').value;
       const zuordnungen = [];
 
       if (!text.trim()) {
-        setStatus('statusBereinigen', 'Bitte zuerst einen Eingabetext einfügen.');
+        $('eingabe').classList.add('input-warning');
+        setStatus('statusBereinigen', 'Bitte zuerst einen Eingabetext einfügen, damit die Anonymisierung starten kann.', 'error');
         $('eingabe').focus();
         return;
       }
+
+      $('eingabe').classList.remove('input-warning');
 
       const mailMap = new Map();
       let mailZaehler = 0;
@@ -685,13 +704,13 @@
       }
 
       updateCounts();
-      setStatus('statusBereinigen', 'Anonymisierung abgeschlossen. Bitte markierte Begriffe prüfen.', true);
+      setStatus('statusBereinigen', 'Anonymisierung abgeschlossen. Bitte markierte Begriffe prüfen.', 'success');
     });
 
     $('zurueckwandeln').addEventListener('click', function () {
       let text = $('kiAntwort').value;
       if (!text.trim()) {
-        setStatus('statusAntwort', 'Bitte zuerst eine KI-Antwort einfügen.');
+        setStatus('statusAntwort', 'Bitte zuerst eine KI-Antwort einfügen.', 'error');
         $('kiAntwort').focus();
         return;
       }
@@ -699,7 +718,7 @@
         text = text.split(eintrag.platzhalter).join(eintrag.original);
       });
       $('kiAntwort').value = text;
-      setStatus('statusAntwort', 'Originalwerte wurden wiederhergestellt.', true);
+      setStatus('statusAntwort', 'Originalwerte wurden wiederhergestellt.', 'success');
     });
 
     $('kopierenBereinigt').addEventListener('click', function () {
