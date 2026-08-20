@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Personenbezogene Angaben ersetzen</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #172033;
+      --muted: #64748b;
+      --border: #d9e0ea;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --success: #15803d;
+      --warning-bg: #fff8db;
+      --warning-border: #f0cf66;
+      --warning-text: #7a5800;
+      --danger: #b42318;
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+      --radius: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #eef4ff 0, var(--bg) 240px);
+      line-height: 1.55;
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 48px 0 64px;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .header-copy {
+      min-width: 0;
+    }
+
+    .theme-toggle {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+      white-space: nowrap;
+    }
+
+    .theme-toggle:hover {
+      background: var(--surface-soft);
+    }
+
+    .theme-toggle-icon {
+      width: 1.2em;
+      text-align: center;
+      font-size: 1.05rem;
+      line-height: 1;
+    }
+
+    h1, h2, p { margin-top: 0; }
+
+    h1 {
+      font-size: clamp(1.9rem, 3vw, 2.7rem);
+      line-height: 1.12;
+      margin-bottom: 10px;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+    }
+
+    .lead {
+      max-width: 760px;
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .notice {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      margin-top: 18px;
+      border: 1px solid #bfd0ff;
+      border-radius: 12px;
+      background: #edf3ff;
+      color: #254477;
+      font-size: 0.93rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.42fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+
+    .card + .card { margin-top: 20px; }
+
+    .field-head,
+    .section-head,
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    label {
+      display: inline-block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .hint {
+      margin: -2px 0 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 240px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 15px;
+      font: inherit;
+      color: inherit;
+      background: var(--surface-soft);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    textarea.small { min-height: 170px; }
+
+    textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+      background: var(--surface);
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.05s, background 0.2s, border-color 0.2s, opacity 0.2s;
+    }
+
+    button:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-secondary {
+      background: var(--surface-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { background: #eef2f7; }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid #f0c7c3;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 0.9rem;
+      min-height: 1.4em;
+    }
+
+    .status.success { color: var(--success); }
+
+    .output {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 15px;
+      min-height: 150px;
+      background: var(--surface-soft);
+    }
+
+    .placeholder-output:empty::before {
+      content: "Noch kein bereinigter Text vorhanden.";
+      color: var(--muted);
+    }
+
+    .warning-box {
+      border-color: var(--warning-border);
+      background: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
+    #warnhinweis ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    #warnhinweis li { margin: 5px 0; }
+
+    .moeglicher-name {
+      background: #ffe88a;
+      color: #5d4600;
+      padding: 1px 5px;
+      border-radius: 5px;
+      font-weight: 800;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 11px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface-soft);
+      font-size: 0.86rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tbody tr:last-child td { border-bottom: 0; }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    .empty-row {
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 820px) {
+      .container { padding-top: 28px; }
+      .grid { grid-template-columns: 1fr; }
+      .field-head, .section-head { align-items: flex-start; }
+      .actions { align-items: stretch; flex-direction: column; }
+      .actions button { width: 100%; }
+      .header-top { align-items: stretch; flex-direction: column; }
+      .theme-toggle { align-self: flex-start; }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #111c31;
+      --surface-soft: #162238;
+      --text: #e5edf8;
+      --muted: #9aabc0;
+      --border: #2a3a52;
+      --shadow: 0 16px 45px rgba(0, 0, 0, 0.28);
+      color-scheme: dark;
+    }
+
+    :root[data-theme="dark"] body {
+      background: linear-gradient(180deg, #13203a 0, var(--bg) 240px);
+    }
+
+    :root[data-theme="dark"] .notice { background: #162849; color: #c8d8ff; border-color: #2e4f86; }
+    :root[data-theme="dark"] .btn-secondary:hover { background: #21304a; }
+    :root[data-theme="dark"] .warning-box { background: #3a3115; color: #f3d98a; border-color: #7a6522; }
+    :root[data-theme="dark"] .moeglicher-name { background: #695719; color: #fff3b2; }
+    :root[data-theme="dark"] .badge { background: #26335a; color: #c7d2fe; }
+    :root[data-theme="dark"] .theme-toggle { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <div class="header-top">
+        <div class="header-copy">
+          <h1>Personenbezogene Angaben ersetzen</h1>
+          <p class="lead">Anonymisiere sensible Angaben vor der Weitergabe an eine KI und setze die Originalwerte anschließend wieder ein. Die Verarbeitung findet ausschließlich in diesem Browserfenster statt.</p>
+        </div>
+        <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Dunkelmodus aktivieren">
+          <span class="theme-toggle-icon" id="themeToggleIcon" aria-hidden="true">☾</span>
+          <span id="themeToggleText">Dunkel</span>
+        </button>
+      </div>
+      <div class="notice" role="note">
+        <strong>Hinweis:</strong>
+        <span>Die automatische Erkennung ist eine Hilfestellung. Prüfe insbesondere die gelb markierten möglichen Namen vor der Weitergabe.</span>
+      </div>
+    </header>
+
+    <div class="grid">
+      <section>
+        <div class="card">
+          <div class="field-head">
+            <div>
+              <label for="eingabe">1. Eingabetext</label>
+              <p class="hint">Füge hier den Text mit personenbezogenen Angaben ein.</p>
+            </div>
+            <span class="badge" id="eingabeCount">0 Zeichen</span>
+          </div>
+          <textarea id="eingabe" placeholder="Text hier einfügen ..." spellcheck="true"></textarea>
+
+          <div style="margin-top:16px">
+            <label for="wortliste">Eigene Wortliste <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+            <p class="hint">Namen, Firmen- oder Ortsnamen – ein Eintrag pro Zeile.</p>
+            <textarea id="wortliste" class="small" placeholder="Max Mustermann&#10;Beispiel GmbH&#10;Berlin"></textarea>
+          </div>
+
+          <div class="actions" style="margin-top:16px">
+            <button class="btn-primary" id="bereinigen">Text anonymisieren</button>
+            <button class="btn-danger" id="zuruecksetzen" type="button">Alles zurücksetzen</button>
+          </div>
+          <div id="statusBereinigen" class="status" aria-live="polite"></div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <h2>2. Bereinigter Text</h2>
+            <span class="badge" id="trefferCount">0 Ersetzungen</span>
+          </div>
+          <div id="ausgabe" class="output placeholder-output" tabindex="0"></div>
+          <div class="toolbar">
+            <button class="btn-secondary" id="kopierenBereinigt" type="button">Bereinigten Text kopieren</button>
+          </div>
+          <div id="statusKopieren" class="status" aria-live="polite"></div>
+        </div>
+
+        <div class="card">
+          <h2>3. Antwort der KI</h2>
+          <p class="hint">Füge die KI-Antwort mit den Platzhaltern hier ein und stelle anschließend die Originalwerte wieder her.</p>
+          <textarea id="kiAntwort" placeholder="Antwort der KI hier einfügen ..."></textarea>
+          <div class="toolbar">
+            <button class="btn-primary" id="zurueckwandeln">Originalwerte wiederherstellen</button>
+            <button class="btn-secondary" id="kopierenAntwort" type="button">Antwort kopieren</button>
+          </div>
+          <div id="statusAntwort" class="status" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <aside>
+        <div class="card">
+          <h2>Mögliche übersehene Namen</h2>
+          <p class="hint">Diese Wörter wurden nicht ersetzt, wirken aber möglicherweise wie Eigennamen.</p>
+          <div id="warnhinweis" class="output warning-box">Keine Prüfung durchgeführt.</div>
+        </div>
+
+        <div class="card">
+          <div class="section-head">
+            <h2>Zuordnung</h2>
+            <span class="badge" id="mappingCount">0 Einträge</span>
+          </div>
+          <p class="hint">Diese Tabelle bleibt lokal im Browser und wird für die Rückwandlung verwendet.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Platzhalter</th>
+                  <th>Originalwert</th>
+                </tr>
+              </thead>
+              <tbody id="zuordnung">
+                <tr><td colspan="2" class="empty-row">Noch keine Zuordnungen vorhanden.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    let aktuelleZuordnungen = [];
+
+    const $ = (id) => document.getElementById(id);
+
+    const gespeichertesTheme = localStorage.getItem('theme');
+    const systemIstDunkel = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let aktuellesTheme = gespeichertesTheme || (systemIstDunkel ? 'dark' : 'light');
+
+    function setTheme(theme) {
+      aktuellesTheme = theme === 'dark' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = aktuellesTheme;
+      localStorage.setItem('theme', aktuellesTheme);
+
+      const dunkel = aktuellesTheme === 'dark';
+      $('themeToggle').setAttribute('aria-pressed', String(dunkel));
+      $('themeToggle').setAttribute('aria-label', dunkel ? 'Hellmodus aktivieren' : 'Dunkelmodus aktivieren');
+      $('themeToggleIcon').textContent = dunkel ? '☀' : '☾';
+      $('themeToggleText').textContent = dunkel ? 'Hell' : 'Dunkel';
+    }
+
+    function setStatus(id, text, success = false) {
+      const el = $(id);
+      el.textContent = text;
+      el.classList.toggle('success', success);
+    }
+
+    function updateCounts() {
+      $('eingabeCount').textContent = $('eingabe').value.length + ' Zeichen';
+      $('trefferCount').textContent = aktuelleZuordnungen.length + (aktuelleZuordnungen.length === 1 ? ' Ersetzung' : ' Ersetzungen');
+      $('mappingCount').textContent = aktuelleZuordnungen.length + (aktuelleZuordnungen.length === 1 ? ' Eintrag' : ' Einträge');
+    }
+
+    async function copyText(text, statusId) {
+      if (!text.trim()) {
+        setStatus(statusId, 'Es gibt noch nichts zu kopieren.');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        setStatus(statusId, 'In die Zwischenablage kopiert.', true);
+      } catch {
+        setStatus(statusId, 'Kopieren war nicht möglich. Bitte Text manuell markieren.');
+      }
+    }
+
+    setTheme(aktuellesTheme);
+
+    $('themeToggle').addEventListener('click', function () {
+      setTheme(aktuellesTheme === 'dark' ? 'light' : 'dark');
+    });
+
+    $('eingabe').addEventListener('input', updateCounts);
+
+    $('bereinigen').addEventListener('click', function () {
+      let text = $('eingabe').value;
+      const zuordnungen = [];
+
+      if (!text.trim()) {
+        setStatus('statusBereinigen', 'Bitte zuerst einen Eingabetext einfügen.');
+        $('eingabe').focus();
+        return;
+      }
+
+      const mailMap = new Map();
+      let mailZaehler = 0;
+      const mailRegex = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
+      text = text.replace(mailRegex, function (treffer) {
+        if (!mailMap.has(treffer)) {
+          mailZaehler++;
+          const platzhalter = '[MAIL_' + mailZaehler + ']';
+          mailMap.set(treffer, platzhalter);
+          zuordnungen.push({ platzhalter, original: treffer });
+        }
+        return mailMap.get(treffer);
+      });
+
+      const persMap = new Map();
+      let persZaehler = 0;
+      const persRegex = /\b(?:Personalnummer|Personal-Nr\.|Pers\.-Nr\.|PersNr|PN)\s*[:#-]?\s*\d{5}\b/gi;
+      text = text.replace(persRegex, function (treffer) {
+        if (!persMap.has(treffer)) {
+          persZaehler++;
+          const platzhalter = '[PERS_' + persZaehler + ']';
+          persMap.set(treffer, platzhalter);
+          zuordnungen.push({ platzhalter, original: treffer });
+        }
+        return persMap.get(treffer);
+      });
+
+      const ibanMap = new Map();
+      let ibanZaehler = 0;
+      const ibanRegex = /\bDE\s*\d{2}(?:\s*\d){18}\b/gi;
+      text = text.replace(ibanRegex, function (treffer) {
+        if (!ibanMap.has(treffer)) {
+          ibanZaehler++;
+          const platzhalter = '[IBAN_' + ibanZaehler + ']';
+          ibanMap.set(treffer, platzhalter);
+          zuordnungen.push({ platzhalter, original: treffer });
+        }
+        return ibanMap.get(treffer);
+      });
+
+      const kfzMap = new Map();
+      let kfzZaehler = 0;
+      const kfzRegex = /\b[A-ZÄÖÜ]{1,3}\s*[-–]\s*[A-ZÄÖÜ]{1,2}\s+\d{1,4}\b/g;
+      text = text.replace(kfzRegex, function (treffer) {
+        if (!kfzMap.has(treffer)) {
+          kfzZaehler++;
+          const platzhalter = '[KFZ_' + kfzZaehler + ']';
+          kfzMap.set(treffer, platzhalter);
+          zuordnungen.push({ platzhalter, original: treffer });
+        }
+        return kfzMap.get(treffer);
+      });
+
+      const kundeMap = new Map();
+      let kundeZaehler = 0;
+      const kundeRegex = /\bKD\s*-\s*\d{4}\s*-\s*\d{4}\b/gi;
+      text = text.replace(kundeRegex, function (treffer) {
+        if (!kundeMap.has(treffer)) {
+          kundeZaehler++;
+          const platzhalter = '[KUNDE_' + kundeZaehler + ']';
+          kundeMap.set(treffer, platzhalter);
+          zuordnungen.push({ platzhalter, original: treffer });
+        }
+        return kundeMap.get(treffer);
+      });
+
+      const telMap = new Map();
+      let telZaehler = 0;
+      const telRegex = /(?<!\w)(?:\+?\d{1,3}[\s./-]?)?(?:\(?\d{2,5}\)?[\s./-]?)\d(?:[\d\s./-]{4,}\d)(?!\w)/g;
+      text = text.replace(telRegex, function (treffer) {
+        const original = treffer.trim();
+        const anzahlZiffern = (original.match(/\d/g) || []).length;
+        if (anzahlZiffern < 6) return treffer;
+        if (!telMap.has(original)) {
+          telZaehler++;
+          const platzhalter = '[TEL_' + telZaehler + ']';
+          telMap.set(original, platzhalter);
+          zuordnungen.push({ platzhalter, original });
+        }
+        return treffer.replace(original, telMap.get(original));
+      });
+
+      const titelNameMap = new Map();
+      let titelNameZaehler = 0;
+      const titelWort = '(?:Frau|Frauen|Herr|Herrn|Herren|Fräulein|Dr\\.?|Doktor|Doktorin|Doktoren|Prof\\.?|Professor|Professorin|Professoren|Professorinnen)';
+      const titelRegex = new RegExp(`\\b((?:${titelWort}\\s+)+)([A-Za-zÄÖÜäöüßÀ-ÖØ-öø-ÿ'-]+)`, 'gi');
+      text = text.replace(titelRegex, function (treffer, titelTeil, name) {
+        if (!titelNameMap.has(name)) {
+          titelNameZaehler++;
+          const platzhalter = '[NAME_' + titelNameZaehler + ']';
+          titelNameMap.set(name, platzhalter);
+          zuordnungen.push({ platzhalter, original: name });
+        }
+        return titelTeil + titelNameMap.get(name);
+      });
+
+      const wortMap = new Map();
+      let wortZaehler = 0;
+      const wortliste = $('wortliste').value
+        .split(/\r?\n/)
+        .map(function (eintrag) { return eintrag.trim(); })
+        .filter(function (eintrag) { return eintrag.length > 0; });
+
+      wortliste.forEach(function (eintrag) {
+        if (!text.includes(eintrag)) return;
+        if (!wortMap.has(eintrag)) {
+          wortZaehler++;
+          const platzhalter = '[WORT_' + wortZaehler + ']';
+          wortMap.set(eintrag, platzhalter);
+          zuordnungen.push({ platzhalter, original: eintrag });
+        }
+        text = text.split(eintrag).join(wortMap.get(eintrag));
+      });
+
+      aktuelleZuordnungen = zuordnungen;
+
+      const moeglicheNamen = [];
+      const wortRegex = /\b[A-ZÄÖÜ][A-Za-zÄÖÜäöüßÀ-ÖØ-öø-ÿ'-]*\b/g;
+      let wortTreffer;
+      while ((wortTreffer = wortRegex.exec(text)) !== null) {
+        const wort = wortTreffer[0];
+        const start = wortTreffer.index;
+        if (start > 0 && text[start - 1] === '[') continue;
+        const davor = text.slice(0, start);
+        const seitSatzanfang = davor.split(/[.!?](?:\s+|$)/).pop();
+        if (!seitSatzanfang || !/[A-Za-zÄÖÜäöüßÀ-ÖØ-öø-ÿ0-9]/.test(seitSatzanfang)) continue;
+        moeglicheNamen.push({ wort, start, ende: start + wort.length });
+      }
+
+      const ausgabe = $('ausgabe');
+      ausgabe.innerHTML = '';
+      let letztePosition = 0;
+      moeglicheNamen.forEach(function (treffer) {
+        ausgabe.appendChild(document.createTextNode(text.slice(letztePosition, treffer.start)));
+        const markierung = document.createElement('span');
+        markierung.className = 'moeglicher-name';
+        markierung.textContent = treffer.wort;
+        ausgabe.appendChild(markierung);
+        letztePosition = treffer.ende;
+      });
+      ausgabe.appendChild(document.createTextNode(text.slice(letztePosition)));
+      ausgabe.dataset.plainText = text;
+
+      const warnhinweis = $('warnhinweis');
+      warnhinweis.innerHTML = '';
+      if (moeglicheNamen.length === 0) {
+        warnhinweis.textContent = 'Keine möglichen übersehenen Namen gefunden.';
+      } else {
+        const haeufigkeit = new Map();
+        moeglicheNamen.forEach(function (treffer) {
+          haeufigkeit.set(treffer.wort, (haeufigkeit.get(treffer.wort) || 0) + 1);
+        });
+        const ul = document.createElement('ul');
+        Array.from(haeufigkeit.entries()).forEach(function (eintrag) {
+          const li = document.createElement('li');
+          li.textContent = eintrag[0] + (eintrag[1] > 1 ? ' (' + eintrag[1] + '×)' : '');
+          ul.appendChild(li);
+        });
+        warnhinweis.appendChild(ul);
+      }
+
+      const tbody = $('zuordnung');
+      tbody.innerHTML = '';
+      if (zuordnungen.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" class="empty-row">Keine automatisch erkannten Angaben gefunden.</td></tr>';
+      } else {
+        zuordnungen.forEach(function (eintrag) {
+          const tr = document.createElement('tr');
+          const tdPlatzhalter = document.createElement('td');
+          const tdOriginal = document.createElement('td');
+          const code = document.createElement('code');
+          code.textContent = eintrag.platzhalter;
+          tdPlatzhalter.appendChild(code);
+          tdOriginal.textContent = eintrag.original;
+          tr.appendChild(tdPlatzhalter);
+          tr.appendChild(tdOriginal);
+          tbody.appendChild(tr);
+        });
+      }
+
+      updateCounts();
+      setStatus('statusBereinigen', 'Anonymisierung abgeschlossen. Bitte markierte Begriffe prüfen.', true);
+    });
+
+    $('zurueckwandeln').addEventListener('click', function () {
+      let text = $('kiAntwort').value;
+      if (!text.trim()) {
+        setStatus('statusAntwort', 'Bitte zuerst eine KI-Antwort einfügen.');
+        $('kiAntwort').focus();
+        return;
+      }
+      aktuelleZuordnungen.forEach(function (eintrag) {
+        text = text.split(eintrag.platzhalter).join(eintrag.original);
+      });
+      $('kiAntwort').value = text;
+      setStatus('statusAntwort', 'Originalwerte wurden wiederhergestellt.', true);
+    });
+
+    $('kopierenBereinigt').addEventListener('click', function () {
+      copyText($('ausgabe').dataset.plainText || '', 'statusKopieren');
+    });
+
+    $('kopierenAntwort').addEventListener('click', function () {
+      copyText($('kiAntwort').value, 'statusAntwort');
+    });
+
+    $('zuruecksetzen').addEventListener('click', function () {
+      $('eingabe').value = '';
+      $('wortliste').value = '';
+      $('kiAntwort').value = '';
+      $('ausgabe').innerHTML = '';
+      $('ausgabe').dataset.plainText = '';
+      $('warnhinweis').textContent = 'Keine Prüfung durchgeführt.';
+      $('zuordnung').innerHTML = '<tr><td colspan="2" class="empty-row">Noch keine Zuordnungen vorhanden.</td></tr>';
+      aktuelleZuordnungen = [];
+      setStatus('statusBereinigen', '');
+      setStatus('statusKopieren', '');
+      setStatus('statusAntwort', '');
+      updateCounts();
+      $('eingabe').focus();
+    });
+
+    updateCounts();
+  </script>
+</body>
+</html>
